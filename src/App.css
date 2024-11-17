@@ -1,6 +1,9 @@
 /* * {
   border: 1px solid red;
 } */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 .App {
   font-family: sans-serif;
