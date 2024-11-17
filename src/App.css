@@ -1,13 +1,19 @@
+/* * {
+  border: 1px solid red;
+} */
+
 .App {
   font-family: sans-serif;
   text-align: center;
 }
-
+.preview {
+  overflow: hidden;
+}
 .controls {
   display: flex;
   align-items: flex-start;
   justify-content: space-evenly;
   position: absolute;
   bottom: 50px;
-  width: 100%;
+  width: 97vw;
 }

@@ -10,11 +10,12 @@
   "dependencies": {
     "react": "17.0.0",
     "react-dom": "17.0.0",
-    "react-scripts": "3.4.3",
     "three": "0.124.0"
   },
   "devDependencies": {
-    "typescript": "3.8.3"
+    "react-scripts": "^5.0.1",
+    "typescript": "3.8.3",
+    "webpack": "^5.96.1"
   },
   "scripts": {
     "start": "react-scripts start",

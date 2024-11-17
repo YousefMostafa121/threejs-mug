@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three/build/three.module.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -8,6 +8,7 @@ import Image2 from "./assets/model2_img0.jpg";
 import Image3 from "./assets/model3_img0.jpg";
 import Image4 from "./assets/model4_img0.jpg";
 import { DecalGeometry } from "three/examples/jsm/geometries/DecalGeometry.js";
+import "./ThreeJsExample.css";
 
 let container,
   camera,
@@ -23,23 +24,20 @@ let container,
 const init = () => {
   scene = new THREE.Scene();
 
-  // Note: The near and far planes can be set this way due to the use of "logarithmicDepthBuffer" in the renderer below.
   camera = new THREE.PerspectiveCamera(
     20,
     container.offsetWidth / container.offsetHeight,
     1e-5,
     1e10
   );
-
   scene.add(camera);
 
   const hemispheric = new THREE.HemisphereLight(0xffffff, 0x222222, 1);
   scene.add(hemispheric);
 
-  // RENDERER
   renderer = new THREE.WebGLRenderer({
     antialias: true,
-    logarithmicDepthBuffer: true
+    logarithmicDepthBuffer: true,
   });
   renderer.setClearColor(0xffffff);
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -61,7 +59,6 @@ const init = () => {
       const pmremGenerator = new THREE.PMREMGenerator(renderer);
       pmremGenerator.compileEquirectangularShader();
 
-      // Center the model on screen based on bounding box information.
       object.updateMatrixWorld();
       const boundingBox = new THREE.Box3().setFromObject(object);
       const modelSizeVec3 = new THREE.Vector3();
@@ -70,7 +67,6 @@ const init = () => {
       const modelCenter = new THREE.Vector3();
       boundingBox.getCenter(modelCenter);
 
-      // Set up mouse orbit controls.
       orbitControls.reset();
       orbitControls.maxDistance = modelSize * 50;
       orbitControls.enableDamping = true;
@@ -80,7 +76,6 @@ const init = () => {
       orbitControls.screenSpacePanning = true;
       orbitControls.autoRotate = true;
 
-      // Position the camera accordingly.
       object.position.x = -modelCenter.x;
       object.position.y = -modelCenter.y;
       object.position.z = -modelCenter.z;
@@ -94,28 +89,21 @@ const init = () => {
       camera.lookAt(modelCenter);
 
       object.traverse((obj) => {
-        console.log("obj", obj);
         if (
           obj instanceof THREE.Mesh &&
           obj.name === "Mug_Porcelain_PBR001_0"
         ) {
           material = obj.material;
-          console.log("material", material);
-
           mesh = obj;
-
-          // addDecal();
 
           textureSelector.addEventListener("input", (event) => {
             material.map = convertImageToTexture(event.target.value);
-            console.log("material", material);
           });
         } else if (
           obj instanceof THREE.Mesh &&
           obj.name === "Mug_Porcelain_PBR002_0"
         ) {
           const material = obj.material;
-
           colorSelector.addEventListener("input", (event) => {
             material.color.set(event.target.value);
           });
@@ -126,47 +114,14 @@ const init = () => {
       onWindowResize();
     },
     function (error) {
-      // console.error(error);
+      console.error(error);
     }
   );
-};
-
-const addDecal = () => {
-  if (mesh === undefined || decalGeometry !== undefined) return;
-
-  const decalMaterial = material.clone();
-  decalMaterial.depthTest = true;
-  decalMaterial.depthWrite = false;
-  decalMaterial.polygonOffset = true;
-  decalMaterial.polygonOffsetFactor = -4;
-
-  const position = new THREE.Vector3();
-  const orientation = new THREE.Euler();
-
-  new THREE.TextureLoader().load(Image2, (texture) => {
-    texture.encoding = THREE.sRGBEncoding;
-    // texture.flipY = false;
-    const size = new THREE.Vector3(50, 50, 50);
-
-    decalMaterial.map = texture;
-    // decalMaterial.normalMap = texture;
-    // material.color.set("#000000");
-    // material.needsUpdate = true;
-
-    decalGeometry = new DecalGeometry(mesh, position, orientation, size);
-    const decalMesh = new THREE.Mesh(decalGeometry, decalMaterial);
-
-    console.log("decalMesh", decalMesh);
-    console.log("mesh", mesh);
-
-    scene.add(decalMesh);
-  });
 };
 
 const onWindowResize = () => {
   camera.aspect = container.offsetWidth / container.offsetHeight;
   camera.updateProjectionMatrix();
-
   renderer.setSize(window.innerWidth, window.innerHeight);
 };
 
@@ -175,22 +130,15 @@ const convertImageToTexture = (image) => {
   let texture = textureLoader.load(image);
   texture.encoding = THREE.sRGBEncoding;
   texture.flipY = false;
-  //texture.offset.setY(0.5);
-
-  // texture.repeat.x = 1;
-  console.log("offset", texture.offset);
-  // console.log("wrapS", texture.wrapS);
-  // console.log("wrapT", texture.wrapT);
-
   return texture;
 };
 
 const ThreeJSExample = () => {
+  const [uploadedImage, setUploadedImage] = useState(null);
+
   const animate = useCallback(() => {
     requestAnimationFrame(() => animate());
-
     orbitControls.update();
-    // updateTexture();
     renderer.render(scene, camera);
   }, []);
 
@@ -215,9 +163,27 @@ const ThreeJSExample = () => {
     };
   }, [animate]);
 
+  // Function to handle the user image upload
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedImage(e.target.result);
+        // Apply the uploaded image as a texture
+        material.map = convertImageToTexture(e.target.result);
+        material.needsUpdate = true; // Ensure material is updated
+      };
+      reader.readAsDataURL(file); // Read file as data URL
+    }
+  };
+
   return (
     <div className="preview">
-      <div className="controls">
+      <div
+        className="controls"
+        style={{ maxWidth: "100%", overflow: "hidden" }}
+      >
         <div>
           <p>Texture</p>
           <select id="imageSelector" ref={textureRef}>
@@ -226,6 +192,10 @@ const ThreeJSExample = () => {
             <option value={Image3}>Image 3</option>
             <option value={Image4}>Image 4</option>
           </select>
+        </div>
+        <div>
+          <p>Upload Texture</p>
+          <input type="file" accept="image/*" onChange={handleImageUpload} />
         </div>
         <div>
           <p>Color</p>
@@ -238,7 +208,7 @@ const ThreeJSExample = () => {
           />
         </div>
       </div>
-      <div ref={ref} />
+      <div ref={ref} style={{ maxWidth: "100%", overflow: "hidden" }} />
     </div>
   );
 };
