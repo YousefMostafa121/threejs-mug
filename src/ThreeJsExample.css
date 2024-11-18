@@ -22,7 +22,7 @@ label {
   color: #333;
 }
 
-select,
+/* select,
 input[type="file"],
 input[type="color"] {
   padding: 10px;
@@ -44,7 +44,7 @@ select:hover,
 input[type="file"]:hover,
 input[type="color"]:hover {
   border-color: #007bff;
-}
+} */
 
 input[type="file"] {
   cursor: pointer;
