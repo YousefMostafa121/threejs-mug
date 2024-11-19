@@ -2,7 +2,7 @@ import heroImage from "./assets/heroImage.png";
 
 const HeroSection = () => {
   return (
-    <section className="    min-h-[750px]  bg-[url('./assets/shapes.png')] bg-no-repeat bg-cover bg-center bg-[#1E1F50] flex items-center ">
+    <section className=" relative z-30    min-h-[750px]  bg-[url('./assets/shapes.png')] bg-no-repeat bg-cover bg-center bg-[#1E1F50] flex items-center ">
       <div className=" container grid grid-cols-1 md:grid-cols-2 gap-5 h-full">
         <div>
           <img src={heroImage} alt="heroImage" />

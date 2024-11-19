@@ -1,12 +1,17 @@
 import { useState } from "react";
 import bottomArrow from "./assets/bottomArrow.png";
-const CupOrderForm = () => {
+const CupOrderForm = ({
+  uploadedImage,
+  setUploaedImage,
+  color_value,
+  setColorValue,
+}) => {
   const [image, setImage] = useState(null);
   const [text, setText] = useState("");
   const [fontColor, setFontColor] = useState("#000000");
   const [cupColor, setCupColor] = useState("#c4a18a");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  console.log(uploadedImage, "uploadedImage");
   const handleOrderSubmit = () => {
     // When the button is clicked, open the modal
     setIsModalOpen(true);
@@ -18,7 +23,7 @@ const CupOrderForm = () => {
   };
 
   return (
-    <div className="">
+    <div className=" relative z-40 bg-white">
       {/* Text/Image Placement Dropdown */}
       <div className="relative mb-4">
         <label className="block text-right mb-2">مكان النص / الصورة</label>
@@ -83,7 +88,7 @@ const CupOrderForm = () => {
           <input
             type="file"
             className="block w-full border border-gray-300 rounded-[6px] p-2 absolute opacity-0"
-            onChange={(e) => setImage(e.target.files[0])}
+            onChange={(e) => setUploaedImage(e.target.files[0])}
           />
         </div>
 
@@ -112,7 +117,10 @@ const CupOrderForm = () => {
           <input
             type="color"
             value={cupColor}
-            onChange={(e) => setCupColor(e.target.value)}
+            onChange={(e) => {
+              setCupColor(e.target.value);
+              setColorValue(e.target.value);
+            }}
             className="ml-4 w-[70px] h-[56px] rounded-[6px] outline-none border-none"
           />
         </div>

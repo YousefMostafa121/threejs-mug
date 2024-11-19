@@ -5,6 +5,7 @@ import Header from "./Header";
 import HeroSection from "./HeroSection";
 import Footer from "./Footer";
 import CupOrderForm from "./CupOrderForm";
+import ShowForm from "./ShowForm";
 
 export default class App extends Component {
   render() {
@@ -14,13 +15,10 @@ export default class App extends Component {
         <Header />
         <HeroSection />
         <section className=" container py-20">
-          <p className="text-[28px] xl:text-[30px] 2xl:text-[32px] text-black font-[700] text-center mb-10">
+          <p className="text-[28px] xl:text-[30px] 2xl:text-[32px] text-black font-[700] text-center mb-10 relative z-30">
             طباعة علي الكوب
           </p>
-          <div className=" grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <CupOrderForm />
-            {/* threeJsExample components here */}
-          </div>
+          <ShowForm />
         </section>
 
         <Footer />

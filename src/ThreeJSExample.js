@@ -50,7 +50,7 @@ const init = () => {
 
   const cameraPos = new THREE.Vector3(-0.2, 0.4, 1.4);
   orbitControls = new OrbitControls(camera, renderer.domElement);
-
+  orbitControls.enableZoom = false;
   loader.load(
     Mug,
     (gltf) => {
@@ -105,6 +105,7 @@ const init = () => {
         ) {
           const material = obj.material;
           colorSelector.addEventListener("input", (event) => {
+            console.log(event, "event");
             material.color.set(event.target.value);
           });
         }
@@ -129,13 +130,13 @@ const convertImageToTexture = (image) => {
   const textureLoader = new THREE.TextureLoader();
   let texture = textureLoader.load(image);
   texture.encoding = THREE.sRGBEncoding;
-  texture.flipY = false;
+  texture.flipY = true;
   return texture;
 };
 
-const ThreeJSExample = () => {
+const ThreeJSExample = ({ uploadedImagee, color_value }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
-
+  console.log(uploadedImagee, "uploadedImagee");
   const animate = useCallback(() => {
     requestAnimationFrame(() => animate());
     orbitControls.update();
@@ -165,7 +166,9 @@ const ThreeJSExample = () => {
 
   // Function to handle the user image upload
   const handleImageUpload = (event) => {
-    const file = event.target.files[0];
+    console.log(event, "event");
+    const file = event;
+    console.log(file, "file");
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -177,13 +180,16 @@ const ThreeJSExample = () => {
       reader.readAsDataURL(file); // Read file as data URL
     }
   };
+  useEffect(() => {
+    uploadedImagee && handleImageUpload(uploadedImagee);
+  }, [uploadedImagee]);
+
+  console.log(color_value, "color_value");
+  console.log(colorRef.current, "colorRef.current");
 
   return (
     <div className="preview">
-      <div
-        className="controls"
-        style={{ maxWidth: "100%", overflow: "hidden" }}
-      >
+      <div className="controls">
         <div>
           <p>Texture</p>
           <select id="imageSelector" ref={textureRef}>
@@ -204,11 +210,12 @@ const ThreeJSExample = () => {
             id="colorPicker"
             name="favcolor"
             defaultValue="#ffffff"
+            value={color_value}
             ref={colorRef}
           />
         </div>
       </div>
-      <div ref={ref} style={{ maxWidth: "100%", overflow: "hidden" }} />
+      <div ref={ref} className=" bg-red-600 -mt-[15rem] z-0" />
     </div>
   );
 };
